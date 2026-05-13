@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+<title>Save LA. Spencer Pratt for Mayor. | This isn't a campaign. It's a mission.</title>
+<meta name="description" content="My house burned. Karen Bass was in Ghana. 16 months later, only 15% of Palisades homes have rebuild permits. I'm not letting LA go through that again. Spencer Pratt for Mayor." />
+<meta name="theme-color" content="#000000" />
+<meta property="og:title" content="Save LA. Spencer Pratt for Mayor." />
+<meta property="og:description" content="This isn't a campaign. It's a mission. Spencer Pratt for Mayor of Los Angeles. Vote by June 2." />
+<meta property="og:image" content="https://mayorpratt.com/wp-content/uploads/2026/01/OG-2.png" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+<style>
+  :root {
+    --black: #0A0A0A;
+    --gold: #F76B1C;
+    --gold-light: #FF9145;
+    --gold-dark: #D55510;
+    --white: #FFFFFF;
+    --off-white: #F5F5F5;
+    --gray-light: #CCCCCC;
+    --gray: #999999;
+    --gray-dark: #4A4A4A;
+    --red: #DC2626;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--black);
+    color: var(--off-white);
+    line-height: 1.55;
+    overflow-x: hidden;
+  }
+  img { max-width: 100%; height: auto; display: block; }
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; cursor: pointer; border: 0; }
+
+  .urgent-banner {
+    background: var(--gold);
+    color: var(--black);
+    text-align: center;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .urgent-banner a { color: var(--black); text-decoration: underline; }
+
+  .header {
+    background: rgba(10,10,10,0.96);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 14px 20px;
+    position: sticky;
+    top: 38px;
+    z-index: 99;
+    border-bottom: 1px solid rgba(247, 107, 28, 0.15);
+  }
+  .header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo img { height: 38px; width: auto; }
+  .donate-btn {
+    background: var(--gold);
+    color: var(--black);
+    padding: 10px 22px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    transition: all 0.2s;
+  }
+  .donate-btn:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+  /* ===== HERO ===== */
+  .hero {
+    position: relative;
+    min-height: 92vh;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    padding: 60px 20px;
+  }
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(180deg, rgba(10,10,10,0.45) 0%, rgba(10,10,10,0.7) 50%, var(--black) 100%),
+      url('https://mayorpratt.com/wp-content/uploads/2026/01/Brandon-02771_Web-JPeg-e1769322375554.webp');
+    background-size: cover;
+    background-position: center top;
+    z-index: 0;
+  }
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 1000px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .hero-eyebrow {
+    color: var(--gold);
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(44px, 10vw, 104px);
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -0.025em;
+    color: var(--white);
+    margin-bottom: 24px;
+  }
+  .hero h1 .accent {
+    color: var(--gold);
+    font-style: italic;
+  }
+  .hero-tagline {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(20px, 3vw, 28px);
+    color: var(--gold);
+    font-style: italic;
+    font-weight: 700;
+    margin-bottom: 36px;
+  }
+  .hero-stats {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    max-width: 720px;
+    margin-bottom: 36px;
+  }
+  .hero-stat {
+    background: rgba(247, 107, 28, 0.1);
+    border-left: 4px solid var(--gold);
+    padding: 16px 20px;
+    border-radius: 4px;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+  .hero-stat .big {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .hero-stat .small {
+    font-size: 14px;
+    color: var(--white);
+  }
+
+  .cta-group {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .btn-primary {
+    background: var(--gold);
+    color: var(--black);
+    padding: 18px 32px;
+    border-radius: 6px;
+    font-weight: 800;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    min-height: 56px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    box-shadow: 0 4px 20px rgba(247, 107, 28, 0.3);
+  }
+  .btn-primary:hover {
+    background: var(--gold-light);
+    transform: translateY(-2px);
+  }
+  .btn-secondary {
+    background: transparent;
+    color: var(--white);
+    padding: 18px 32px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    min-height: 56px;
+    border: 2px solid var(--white);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .btn-secondary:hover { background: var(--white); color: var(--black); }
+
+  /* ===== STORY ===== */
+  .story {
+    background: var(--black);
+    padding: 80px 20px;
+  }
+  .story-inner {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .story-eyebrow {
+    color: var(--gold);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+  .story h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 6vw, 52px);
+    color: var(--white);
+    line-height: 1.05;
+    margin-bottom: 24px;
+    text-align: center;
+    font-weight: 800;
+  }
+  .story-prose {
+    font-size: 19px;
+    line-height: 1.7;
+    color: var(--gray-light);
+  }
+  .story-prose p { margin-bottom: 18px; }
+  .story-prose p strong { color: var(--gold); font-weight: 700; }
+  .story-prose p.lead {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-style: italic;
+    color: var(--white);
+    line-height: 1.5;
+  }
+
+  /* ===== PLAN ===== */
+  .plan {
+    background: linear-gradient(180deg, var(--black) 0%, #1a1a1a 100%);
+    padding: 80px 20px;
+  }
+  .plan-inner { max-width: 1100px; margin: 0 auto; }
+  .plan-head { text-align: center; margin-bottom: 50px; }
+  .plan-eyebrow {
+    color: var(--gold);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    margin-bottom: 14px;
+  }
+  .plan h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 6vw, 52px);
+    color: var(--white);
+    line-height: 1.05;
+    font-weight: 800;
+    margin-bottom: 16px;
+  }
+  .plan-sub {
+    color: var(--gray-light);
+    font-size: 17px;
+    max-width: 580px;
+    margin: 0 auto;
+  }
+  .plan-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .plan-item {
+    background: rgba(247, 107, 28, 0.05);
+    border-left: 4px solid var(--gold);
+    padding: 26px 28px;
+    border-radius: 4px;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .plan-item:hover {
+    background: rgba(247, 107, 28, 0.1);
+    transform: translateX(4px);
+  }
+  .plan-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 14px;
+    color: var(--gold);
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: 0.1em;
+  }
+  .plan-item h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: var(--white);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+  .plan-item p {
+    color: var(--gray-light);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ===== TESTIMONIALS ===== */
+  .testimonials {
+    background: var(--black);
+    padding: 80px 20px;
+  }
+  .testimonials-head { text-align: center; margin-bottom: 50px; max-width: 700px; margin-left: auto; margin-right: auto; }
+  .testimonials h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(30px, 5.5vw, 46px);
+    color: var(--white);
+    line-height: 1.05;
+    font-weight: 800;
+    margin-bottom: 16px;
+  }
+  .testi-grid {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .testi {
+    background: linear-gradient(180deg, #1a1a1a 0%, #0e0e0e 100%);
+    border: 1px solid rgba(247, 107, 28, 0.2);
+    border-radius: 8px;
+    padding: 32px 28px;
+    position: relative;
+  }
+  .testi blockquote {
+    font-family: 'Playfair Display', serif;
+    font-size: 19px;
+    line-height: 1.45;
+    color: var(--white);
+    font-style: italic;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+  .testi blockquote::before { content: '"'; color: var(--gold); font-size: 32px; vertical-align: -0.1em; margin-right: 2px; }
+  .testi blockquote::after { content: '"'; color: var(--gold); font-size: 32px; vertical-align: -0.5em; margin-left: 2px; }
+  .testi-attr {
+    border-top: 1px solid rgba(247, 107, 28, 0.2);
+    padding-top: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .testi-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--gold);
+    color: var(--black);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .testi-name {
+    font-weight: 700;
+    color: var(--white);
+    font-size: 14px;
+  }
+  .testi-role {
+    color: var(--gray);
+    font-size: 12px;
+    margin-top: 2px;
+  }
+
+  /* ===== ROGAN BIG QUOTE ===== */
+  .big-quote {
+    background:
+      linear-gradient(135deg, rgba(10,10,10,0.92) 0%, rgba(10,10,10,0.6) 100%),
+      url('https://mayorpratt.com/wp-content/themes/pratt-theme/assets/images/about-spencer-4.webp');
+    background-size: cover;
+    background-position: center;
+    padding: 90px 20px;
+    text-align: center;
+  }
+  .big-quote blockquote {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 6vw, 64px);
+    line-height: 1.05;
+    color: var(--white);
+    font-style: italic;
+    font-weight: 700;
+    margin-bottom: 24px;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .big-quote blockquote::before { content: '"'; color: var(--gold); }
+  .big-quote blockquote::after { content: '"'; color: var(--gold); }
+  .big-quote-attr {
+    color: var(--gold);
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-weight: 700;
+  }
+  .big-quote-role {
+    color: var(--gray-light);
+    font-size: 13px;
+    margin-top: 6px;
+  }
+
+  /* ===== ACTION SECTION (3 CTAs) ===== */
+  .actions {
+    background: linear-gradient(180deg, var(--black) 0%, #1a1a1a 100%);
+    padding: 80px 20px;
+  }
+  .actions-head { text-align: center; margin-bottom: 50px; }
+  .actions h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 6vw, 52px);
+    color: var(--white);
+    line-height: 1.05;
+    font-weight: 800;
+  }
+  .actions-grid {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .action-card {
+    background: rgba(247, 107, 28, 0.05);
+    border: 1px solid rgba(247, 107, 28, 0.3);
+    border-radius: 8px;
+    padding: 30px 26px;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .action-card:hover {
+    background: rgba(247, 107, 28, 0.1);
+    border-color: var(--gold);
+    transform: translateY(-3px);
+  }
+  .action-icon {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 12px;
+    font-weight: 900;
+  }
+  .action-card h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: var(--white);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .action-card p {
+    color: var(--gray-light);
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+  .action-btn {
+    background: var(--gold);
+    color: var(--black);
+    padding: 14px 24px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    display: inline-block;
+    min-height: 48px;
+    line-height: 20px;
+  }
+  .action-btn:hover { background: var(--gold-light); }
+
+  /* ===== EMAIL SIGNUP ===== */
+  .signup {
+    background:
+      linear-gradient(135deg, rgba(10,10,10,0.94) 0%, rgba(10,10,10,0.78) 100%),
+      url('https://mayorpratt.com/wp-content/themes/pratt-theme/assets/images/signup-bg.webp');
+    background-size: cover;
+    background-position: center;
+    padding: 80px 20px;
+  }
+  .signup-inner { max-width: 560px; margin: 0 auto; text-align: center; }
+  .signup h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 5vw, 42px);
+    color: var(--white);
+    line-height: 1.1;
+    margin-bottom: 14px;
+    font-weight: 800;
+  }
+  .signup-sub {
+    color: var(--gray-light);
+    font-size: 16px;
+    margin-bottom: 28px;
+  }
+  .signup-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .form-input {
+    background: rgba(255,255,255,0.95);
+    color: var(--black);
+    border: 2px solid transparent;
+    border-radius: 6px;
+    padding: 16px 18px;
+    font-size: 16px;
+    font-family: inherit;
+    width: 100%;
+    min-height: 56px;
+    outline: none;
+  }
+  .form-input:focus { border-color: var(--gold); }
+  .form-consent {
+    color: var(--gray);
+    font-size: 11px;
+    line-height: 1.5;
+    margin-top: 6px;
+    text-align: left;
+  }
+  .form-consent a { color: var(--gold); text-decoration: underline; }
+
+  /* ===== FINAL CTA ===== */
+  .final-cta {
+    background: var(--gold);
+    color: var(--black);
+    padding: 60px 20px;
+    text-align: center;
+  }
+  .final-cta h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 5vw, 44px);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 20px;
+  }
+  .final-cta .btn-final {
+    background: var(--black);
+    color: var(--gold);
+    padding: 18px 32px;
+    border-radius: 6px;
+    font-weight: 800;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    display: inline-block;
+    min-height: 56px;
+    line-height: 20px;
+  }
+  .final-cta .btn-final:hover { background: #222; }
+
+  /* ===== FOOTER ===== */
+  .footer {
+    background: var(--black);
+    color: var(--gray);
+    padding: 60px 20px 30px;
+    text-align: center;
+    border-top: 1px solid rgba(247, 107, 28, 0.15);
+  }
+  .footer-logo img { height: 50px; margin: 0 auto 20px; }
+  .footer-socials {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin: 24px 0;
+    flex-wrap: wrap;
+  }
+  .footer-socials a {
+    color: var(--gold);
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+  }
+  .footer-disclaimer {
+    font-size: 11px;
+    line-height: 1.7;
+    max-width: 600px;
+    margin: 30px auto 0;
+  }
+  .footer-disclaimer a { color: var(--gold); }
+
+  /* ===== MOBILE STICKY ===== */
+  .mobile-sticky {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--gold);
+    color: var(--black);
+    padding: 12px 14px;
+    z-index: 200;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .mobile-sticky-text { font-size: 13px; font-weight: 700; line-height: 1.2; }
+  .mobile-sticky-text strong { display: block; font-size: 16px; }
+  .mobile-sticky a {
+    background: var(--black);
+    color: var(--gold);
+    padding: 12px 18px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  @media (min-width: 768px) {
+    .hero-stats { grid-template-columns: repeat(3, 1fr); }
+    .testi-grid { grid-template-columns: repeat(2, 1fr); }
+    .actions-grid { grid-template-columns: repeat(3, 1fr); }
+    .mobile-sticky { display: none; }
+  }
+  @media (min-width: 1024px) {
+    .plan-grid { grid-template-columns: repeat(2, 1fr); }
+    .testi-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 767px) {
+    body { padding-bottom: 80px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="urgent-banner">
+  📬 BALLOTS ARE IN MAILBOXES NOW. <a href="/ballot.html">FIND YOUR DROP BOX →</a>
+</div>
+
+<header class="header">
+  <div class="header-inner">
+    <a href="/" class="logo">
+      <img src="https://mayorpratt.com/wp-content/themes/pratt-theme/assets/images/logo.webp" alt="Pratt for Mayor of Los Angeles" />
+    </a>
+    <a href="https://secure.anedot.com/pratt-for-mayor/49b6621f-b6b5-47cc-a713-064b339d8d70?recurring=true" class="donate-btn">Donate</a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">Pacific Palisades Resident · Candidate for Mayor</div>
+    <h1>I lost my home.<br><span class="accent">I'm not letting LA<br>lose its future.</span></h1>
+    <div class="hero-tagline">This isn't a campaign. It's a mission.</div>
+
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="big">15%</div>
+        <div class="small">of Palisades homes have rebuild permits, 16 months later</div>
+      </div>
+      <div class="hero-stat">
+        <div class="big">75,000+</div>
+        <div class="small">Angelenos still homeless, under Bass's watch</div>
+      </div>
+      <div class="hero-stat">
+        <div class="big">31%</div>
+        <div class="small">Karen Bass approval rating. 25 pts underwater.</div>
+      </div>
+    </div>
+
+    <div class="cta-group">
+      <a href="https://secure.anedot.com/pratt-for-mayor/49b6621f-b6b5-47cc-a713-064b339d8d70?recurring=true" class="btn-primary">Chip In Now</a>
+      <a href="#signup" class="btn-secondary">Join The Movement</a>
+    </div>
+  </div>
+</section>
+
+<!-- STORY -->
+<section class="story">
+  <div class="story-inner">
+    <div class="story-eyebrow">My Story</div>
+    <h2>The day LA failed all of us.</h2>
+    <div class="story-prose">
+      <p class="lead">On January 7, 2025, I stood on my street and watched my neighborhood burn.</p>
+      <p>Karen Bass was in Ghana. We were screaming for help. The hydrants had no water. Fire trucks were stranded. The mayor of LA was 8,000 miles away on a trip she'd been warned not to take.</p>
+      <p>I lost my home. So did 30,000 of my neighbors. Sixteen months later, <strong>only 15% of us have rebuild permits</strong>. People are still in hotel rooms. Insurance companies are still saying no. The city that should have shown up for us never did.</p>
+      <p>I'm not a politician. I never planned to run for anything. I'm a husband and father who watched the system fail in real time. And I realized something: <strong>if I don't run, who will?</strong></p>
+      <p>This isn't about me. It's about the next family whose house burns. The next neighborhood Bass abandons. The next four years of a city that's forgotten how to function.</p>
+      <p><strong>LA is worth saving.</strong> But it won't save itself.</p>
+    </div>
+  </div>
+</section>
+
+<!-- BIG QUOTE -->
+<section class="big-quote">
+  <blockquote>I'd vote for you.</blockquote>
+  <div class="big-quote-attr">Joe Rogan</div>
+  <div class="big-quote-role">The Joe Rogan Experience</div>
+</section>
+
+<!-- PLAN -->
+<section class="plan">
+  <div class="plan-inner">
+    <div class="plan-head">
+      <div class="plan-eyebrow">Spencer's Plan</div>
+      <h2>Real solutions. Day one.</h2>
+      <p class="plan-sub">Seven priorities. Not slogans. Things that actually work in cities that haven't given up.</p>
+    </div>
+    <div class="plan-grid">
+      <div class="plan-item">
+        <div class="plan-num">01</div>
+        <h4>Crisis Leadership & Emergency Readiness</h4>
+        <p>Never again. Real wildfire preparedness with real accountability. Working hydrants. Pre-positioned resources. A mayor who shows up.</p>
+      </div>
+      <div class="plan-item">
+        <div class="plan-num">02</div>
+        <h4>Fiscal Integrity & Government Reform</h4>
+        <p>End the waste. Audit every department. The $14.85B budget needs to serve Angelenos, not bureaucrats and consultants.</p>
+      </div>
+      <div class="plan-item">
+        <div class="plan-num">03</div>
+        <h4>Public Safety & the Rule of Law</h4>
+        <p>Streets safe for families. Real consequences for criminals. A city where you don't have to look over your shoulder.</p>
+      </div>
+      <div class="plan-item">
+        <div class="plan-num">04</div>
+        <h4>Treatment-First Approach to Homelessness</h4>
+        <p>Zero encampments. Real treatment for addiction and mental health. The current system enriches contractors. We end that.</p>
+      </div>
+      <div class="plan-item">
+        <div class="plan-num">05</div>
+        <h4>Infrastructure & Quality of Life</h4>
+        <p>Fix the streets. Restore the parks. Make LA camera-ready again, the way it used to be.</p>
+      </div>
+      <div class="plan-item">
+        <div class="plan-num">06</div>
+        <h4>Economic Opportunity & Small Business</h4>
+        <p>Cut the red tape choking small business. Bring back the production jobs Hollywood is losing every month. LA's economy needs a fighter.</p>
+      </div>
+      <div class="plan-item">
+        <div class="plan-num">07</div>
+        <h4>Utility Accountability & Ratepayer Protection</h4>
+        <p>End the LADWP corruption. Lower rates. Hold the people who failed us during the fire accountable.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials">
+  <div class="testimonials-head">
+    <div class="plan-eyebrow">Real Angelenos</div>
+    <h2>This isn't a Republican thing.<br>It's an LA thing.</h2>
+  </div>
+  <div class="testi-grid">
+    <div class="testi">
+      <blockquote>I voted for Bass in 2022. I will not make that mistake again. My family is still in a hotel sixteen months later. Spencer's the only one who shows up.</blockquote>
+      <div class="testi-attr">
+        <div class="testi-avatar">J</div>
+        <div>
+          <div class="testi-name">Jennifer M.</div>
+          <div class="testi-role">Palisades fire victim · Registered Democrat</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi">
+      <blockquote>I run a small business in Boyle Heights. Crime is up. Permits take forever. Bass doesn't know we exist. Spencer at least listens.</blockquote>
+      <div class="testi-attr">
+        <div class="testi-avatar">R</div>
+        <div>
+          <div class="testi-name">Ricardo T.</div>
+          <div class="testi-role">Small business owner · Independent</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi">
+      <blockquote>I'm 71 years old and I've watched LA decline my entire retirement. Spencer's a real person. That alone is a change. I'm voting for change.</blockquote>
+      <div class="testi-attr">
+        <div class="testi-avatar">D</div>
+        <div>
+          <div class="testi-name">David W.</div>
+          <div class="testi-role">Retired engineer · San Pedro</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ACTIONS -->
+<section class="actions">
+  <div class="actions-head">
+    <div class="plan-eyebrow">Three Ways to Help</div>
+    <h2>The next 20 days decide everything.</h2>
+  </div>
+  <div class="actions-grid">
+    <div class="action-card">
+      <div class="action-icon">$</div>
+      <h4>Donate</h4>
+      <p>Every dollar buys ads, reaches voters, gets ballots returned. We're competing against millions in union money.</p>
+      <a href="https://secure.anedot.com/pratt-for-mayor/49b6621f-b6b5-47cc-a713-064b339d8d70?recurring=true" class="action-btn">Chip In →</a>
+    </div>
+    <div class="action-card">
+      <div class="action-icon">✉</div>
+      <h4>Mail Your Ballot</h4>
+      <p>It's in your mailbox right now. Fill it out tonight. Drop it in a box tomorrow. Get the next person in line to do the same.</p>
+      <a href="/ballot.html" class="action-btn">Find Drop Box →</a>
+    </div>
+    <div class="action-card">
+      <div class="action-icon">→</div>
+      <h4>Tell Three Friends</h4>
+      <p>This race is won 30 voters at a time. Text three Angelenos. Tell them to mail their ballot. Send them this page.</p>
+      <a href="https://www.instagram.com/spencerpratt" class="action-btn" target="_blank" rel="noopener">Share →</a>
+    </div>
+  </div>
+</section>
+
+<!-- SIGNUP -->
+<section class="signup" id="signup">
+  <div class="signup-inner">
+    <div class="plan-eyebrow">Stay In</div>
+    <h2>Join the movement.</h2>
+    <p class="signup-sub">Get campaign updates, ballot reminders, and the next 20 days in your inbox. No spam.</p>
+    <form class="signup-form" onsubmit="submitSignup(event)">
+      <input type="text" class="form-input" placeholder="First name" autocomplete="given-name" required />
+      <input type="email" class="form-input" placeholder="Email address" autocomplete="email" required />
+      <input type="tel" class="form-input" placeholder="Mobile (optional, for ballot reminders)" autocomplete="tel" />
+      <button type="submit" class="btn-primary" style="margin-top: 8px;">Join The Movement</button>
+      <div class="form-consent">
+        By submitting, you consent to receive email and text messages from Pratt for Mayor 2026, including automated messages. Message and data rates may apply. Reply STOP to opt out. <a href="https://mayorpratt.com/privacy-policy/" target="_blank">Privacy Policy</a>.
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <h2>Save LA. Vote by June 2.</h2>
+  <a href="/ballot.html" class="btn-final">Find Your Drop Box</a>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-logo">
+    <img src="https://mayorpratt.com/wp-content/themes/pratt-theme/assets/images/logo-footer.webp" alt="Pratt for Mayor of Los Angeles" />
+  </div>
+  <div class="footer-socials">
+    <a href="https://www.instagram.com/spencerpratt" target="_blank" rel="noopener">Instagram</a>
+    <a href="https://www.tiktok.com/@spencerpratt" target="_blank" rel="noopener">TikTok</a>
+    <a href="https://x.com/SpencerPratt" target="_blank" rel="noopener">X</a>
+    <a href="https://spencerpratt.substack.com/" target="_blank" rel="noopener">Substack</a>
+  </div>
+  <div class="footer-disclaimer">
+    Paid for by Pratt for Mayor 2026 (FPPC ID 1485940)<br>
+    970 Seacoast Drive, Suite 7, Imperial Beach, CA 91932<br><br>
+    <a href="https://mayorpratt.com/privacy-policy/">Privacy Policy</a> &nbsp;·&nbsp;
+    <a href="https://ethics.lacity.gov">Funding details at ethics.lacity.gov</a>
+  </div>
+</footer>
+
+<!-- MOBILE STICKY -->
+<div class="mobile-sticky">
+  <div class="mobile-sticky-text">
+    <strong>Save LA.</strong>
+    Mail your ballot.
+  </div>
+  <a href="/ballot.html">Find Box</a>
+</div>
+
+<script>
+  function submitSignup(e) {
+    e.preventDefault();
+    const form = e.target;
+    form.innerHTML = `
+      <div style="background: var(--gold); color: var(--black); padding: 32px; border-radius: 6px;">
+        <div style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 900; margin-bottom: 8px;">You're in.</div>
+        <div style="font-size: 16px;">Welcome to the movement. Now go mail your ballot. And tell three friends.</div>
+      </div>
+    `;
+    if (typeof gtag === 'function') gtag('event', 'sign_up', { event_category: 'engagement', value: 1 });
+    if (typeof fbq === 'function') fbq('track', 'Lead', { content_name: 'EmailSignup_SaveLA' });
+  }
+</script>
+
+</body>
+</html>

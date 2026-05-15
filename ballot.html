@@ -32,12 +32,44 @@
 <noscript><img height="1" width="1" style="display:none" alt="" src="https://www.facebook.com/tr?id=4456287721319223&ev=PageView&noscript=1"/></noscript>
 
 <script>
-  window.trackEvent = function(eventName, params, userData) {
-    params = params || {};
-    userData = userData || {};
-    var eventId = (crypto && crypto.randomUUID) ? crypto.randomUUID() :
+  window.makeEventId = function() {
+    return (window.crypto && crypto.randomUUID) ? crypto.randomUUID() :
       ('xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c){
         var r = Math.random()*16|0, v = c=='x' ? r : (r&0x3|0x8); return v.toString(16); }));
+  };
+
+  window.readUtmsAndClickIds = function() {
+    try {
+      var p = new URL(window.location.href).searchParams;
+      var out = {};
+      ['utm_source','utm_medium','utm_campaign','utm_content','utm_term'].forEach(function(k){
+        var v = p.get(k); if (v) out[k] = v;
+      });
+      if (p.get('fbclid')) out.fbclid = p.get('fbclid');
+      if (p.get('gclid')) out.gclid = p.get('gclid');
+      return out;
+    } catch(e) { return {}; }
+  };
+
+  window.submitLead = function(payload) {
+    try {
+      var body = Object.assign({
+        event_source_url: window.location.href,
+        referrer: document.referrer
+      }, window.readUtmsAndClickIds(), payload);
+      fetch('/api/lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        keepalive: true
+      }).catch(function(){});
+    } catch(e) {}
+  };
+
+  window.trackEvent = function(eventName, params, userData, eventIdOverride) {
+    params = params || {};
+    userData = userData || {};
+    var eventId = eventIdOverride || window.makeEventId();
     if (typeof fbq === 'function') {
       if (userData.email || userData.zip || userData.phone) {
         fbq('setUserProperties', window.META_PIXEL_ID, userData);
@@ -598,10 +630,20 @@
     if (typeof gtag === 'function') gtag('event', 'ballot_action', { event_category: 'engagement' });
     if (typeof window.trackEvent === 'function') {
       const userData = zip ? { zip: zip } : {};
+      const eventId = window.makeEventId();
+      if (zip) {
+        window.submitLead({
+          source_page: 'ballot',
+          form_type: 'ballot_finder',
+          zip: zip,
+          event_id: eventId
+        });
+      }
       window.trackEvent(
         'Lead',
         { content_name: 'BallotFinder', content_category: 'ballot_action' },
-        userData
+        userData,
+        eventId
       );
     }
   }
@@ -643,12 +685,22 @@
   function submitSignup(e) {
     e.preventDefault();
     const form = e.target;
-    // Capture PII before replacing form HTML
     const email = form.querySelector('input[type=email]')?.value || '';
     const phone = form.querySelector('input[type=tel]')?.value || '';
+    const consentCheckbox = form.querySelector('input[type=checkbox]');
+    const consentSms = consentCheckbox ? consentCheckbox.checked : false;
     const userData = {};
     if (email) userData.email = email;
     if (phone) userData.phone = phone;
+    const eventId = window.makeEventId();
+    window.submitLead({
+      source_page: 'ballot',
+      form_type: 'reminder_signup',
+      email: email,
+      phone: phone,
+      consent_sms: consentSms,
+      event_id: eventId
+    });
     form.innerHTML = `
       <div style="background: var(--gold); color: var(--black); padding: 28px; border-radius: 6px;">
         <div style="font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 900; margin-bottom: 6px;">Reminder set.</div>
@@ -657,7 +709,7 @@
     `;
     if (typeof gtag === 'function') gtag('event', 'sign_up', { event_category: 'engagement' });
     if (typeof window.trackEvent === 'function') {
-      window.trackEvent('Lead', { content_name: 'BallotReminder', content_category: 'signup' }, userData);
+      window.trackEvent('Lead', { content_name: 'BallotReminder', content_category: 'signup' }, userData, eventId);
       window.trackEvent('CompleteRegistration', { content_name: 'BallotReminder' }, userData);
     }
   }

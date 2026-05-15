@@ -41,13 +41,50 @@
 
 <!-- Unified Pixel + CAPI tracker (deduped via event_id) -->
 <script>
-  window.trackEvent = function(eventName, params, userData) {
-    params = params || {};
-    userData = userData || {};
-    // Generate a UUIDv4-ish event_id for deduplication
-    var eventId = (crypto && crypto.randomUUID) ? crypto.randomUUID() :
+  // Shared UUID generator
+  window.makeEventId = function() {
+    return (window.crypto && crypto.randomUUID) ? crypto.randomUUID() :
       ('xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c){
         var r = Math.random()*16|0, v = c=='x' ? r : (r&0x3|0x8); return v.toString(16); }));
+  };
+
+  // Read UTMs + click IDs from current URL
+  window.readUtmsAndClickIds = function() {
+    try {
+      var url = new URL(window.location.href);
+      var p = url.searchParams;
+      var out = {};
+      ['utm_source','utm_medium','utm_campaign','utm_content','utm_term'].forEach(function(k){
+        var v = p.get(k); if (v) out[k] = v;
+      });
+      if (p.get('fbclid')) out.fbclid = p.get('fbclid');
+      if (p.get('gclid')) out.gclid = p.get('gclid');
+      return out;
+    } catch(e) { return {}; }
+  };
+
+  // Submit a lead to /api/lead (Supabase). Fire-and-forget.
+  window.submitLead = function(payload) {
+    try {
+      var url = new URL(window.location.href);
+      var attribution = window.readUtmsAndClickIds();
+      var body = Object.assign({
+        event_source_url: window.location.href,
+        referrer: document.referrer
+      }, attribution, payload);
+      fetch('/api/lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        keepalive: true
+      }).catch(function(){});
+    } catch(e) {}
+  };
+
+  window.trackEvent = function(eventName, params, userData, eventIdOverride) {
+    params = params || {};
+    userData = userData || {};
+    var eventId = eventIdOverride || window.makeEventId();
     // 1) Client-side (Browser Pixel) — pass user data so Advanced Matching can hash it
     if (typeof fbq === 'function') {
       if (userData.email || userData.zip || userData.phone) {
@@ -1044,13 +1081,20 @@
     results.scrollIntoView({ behavior: 'smooth', block: 'center' });
     // Fire conversion event (Pixel + CAPI deduped)
     if (typeof gtag === 'function') gtag('event', 'ballot_action', { event_category: 'engagement', value: 1 });
-    if (typeof window.trackEvent === 'function') {
-      window.trackEvent(
-        'Lead',
-        { content_name: 'BallotFinder', content_category: 'ballot_action' },
-        { zip: zip }
-      );
-    }
+    var eventId = window.makeEventId();
+    // Store the ballot-finder lead in Supabase (ZIP only — no email captured here)
+    window.submitLead({
+      source_page: 'home',
+      form_type: 'ballot_finder',
+      zip: zip,
+      event_id: eventId
+    });
+    window.trackEvent(
+      'Lead',
+      { content_name: 'BallotFinder', content_category: 'ballot_action' },
+      { zip: zip },
+      eventId
+    );
   }
 
   // ===== SIGNUP FORM SUBMISSION =====
@@ -1060,19 +1104,32 @@
     // Capture PII before replacing form HTML
     const email = form.querySelector('input[type=email]')?.value || '';
     const phone = form.querySelector('input[type=tel]')?.value || '';
+    const consentCheckbox = form.querySelector('input[type=checkbox]');
+    const consentSms = consentCheckbox ? consentCheckbox.checked : false;
     const userData = {};
     if (email) userData.email = email;
     if (phone) userData.phone = phone;
-    // In production, post to the campaign CRM (Action Network, NGP VAN, etc.)
+    const eventId = window.makeEventId();
+    // 1) Store the lead in Supabase
+    window.submitLead({
+      source_page: 'home',
+      form_type: 'email_signup',
+      email: email,
+      phone: phone,
+      consent_sms: consentSms,
+      event_id: eventId
+    });
+    // 2) Show success UI
     form.innerHTML = `
       <div style="background: var(--gold); color: var(--black); padding: 32px; border-radius: 6px;">
         <div style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 900; margin-bottom: 8px;">You're in.</div>
         <div style="font-size: 16px;">We'll text you to mail your ballot. Tell three friends.</div>
       </div>
     `;
+    // 3) Fire conversion events — Lead uses same event_id as the Supabase row
     if (typeof gtag === 'function') gtag('event', 'sign_up', { event_category: 'engagement', value: 1 });
     if (typeof window.trackEvent === 'function') {
-      window.trackEvent('Lead', { content_name: 'EmailSignup', content_category: 'signup' }, userData);
+      window.trackEvent('Lead', { content_name: 'EmailSignup', content_category: 'signup' }, userData, eventId);
       window.trackEvent('CompleteRegistration', { content_name: 'EmailSignup' }, userData);
     }
   }

@@ -14,11 +14,13 @@ This installs **both** the browser Pixel and Conversions API (CAPI) on the three
 | `package.json` | `vercel-build` script wiring. |
 | `vercel.json` | Adds `buildCommand`, declares `api/track.js` as a Node 20 function, and no-store cache on `/api/*`. |
 
-## Step 1 — Set environment variables in Vercel (CAPI only)
+## Step 1 — Set environment variables in Vercel
 
 The Pixel ID `4456287721319223` is **already hardcoded** in the three HTML files. The browser Pixel fires the moment you redeploy — no env vars required for client-side tracking.
 
-For the server-side half (Conversions API), add the following in Vercel dashboard → `pratt-landing` → **Settings → Environment Variables** (Production + Preview):
+Add the following in Vercel dashboard → `pratt-landing` → **Settings → Environment Variables** (Production + Preview):
+
+### Meta Conversions API (server-side Pixel half)
 
 | Name | Value | Where to get it |
 |---|---|---|
@@ -27,6 +29,15 @@ For the server-side half (Conversions API), add the following in Vercel dashboar
 | `META_TEST_EVENT_CODE` | *(optional, only while validating)* e.g. `TEST12345` | Events Manager → your Pixel → **Test events** tab. Use during QA, then **delete this var** before launching ads. |
 
 > Without `META_CAPI_TOKEN`, the `/api/track` endpoint returns `{ok:false, reason:"capi_not_configured"}` — the browser Pixel still works, but you lose CAPI's iOS conversion recovery (typically a 10–25% lift on attributed Leads).
+
+### Supabase (lead capture)
+
+| Name | Value | Where to get it |
+|---|---|---|
+| `SUPABASE_URL` | `https://eqppnblxyxmslhgxiror.supabase.co` | Snagtooth org → `pratt-campaign` project → Settings → API → Project URL |
+| `SUPABASE_SERVICE_ROLE_KEY` | Long JWT starting with `eyJ...` | Same Settings → API page → "Project API keys" section → copy the **`service_role`** key (has a red "secret" badge). **Never put this in client code.** |
+
+> Without these, `/api/lead` returns `{ok:false, reason:"supabase_not_configured"}` — Pixel tracking still works, but signups are NOT captured. Get this set before turning on paid traffic.
 
 ## Step 2 — Redeploy
 
@@ -73,6 +84,34 @@ Vercel will run `npm run vercel-build`, which runs `scripts/inject-pixel-id.mjs`
 | `Lead` | `ballot.html` | Reminder signup submitted | `content_name: BallotReminder` |
 | `CompleteRegistration` | `ballot.html` & `index.html` | After signup | `content_name` matches the Lead |
 | `Lead` | `save-la.html` | Email signup submitted | `content_name: EmailSignup_SaveLA` |
+
+## Lead capture (Supabase)
+
+Every form submission writes a row to `public.leads` in the `pratt-campaign` Supabase project. The same `event_id` UUID is shared between the Supabase row and the Meta Lead event — so you can join Meta ad performance to the actual lead record.
+
+**Schema (key fields):**
+
+| Column | Notes |
+|---|---|
+| `id` | UUID PK |
+| `created_at` | TIMESTAMPTZ |
+| `source_page` | `home` / `ballot` / `save-la` |
+| `form_type` | `email_signup` / `ballot_finder` / `reminder_signup` / `save_la_signup` |
+| `email`, `phone`, `first_name`, `last_name`, `zip` | Self-explanatory |
+| `consent_sms` | Bool — captured from the consent checkbox |
+| `event_id` | UUID shared with Meta Lead event — join key |
+| `fbclid`, `gclid` | Click IDs from URL — direct attribution to ad |
+| `utm_source/medium/campaign/content/term` | Read from URL params at submit time |
+| `ip`, `user_agent`, `referrer` | Server-captured request context |
+
+**Accessing leads:**
+
+- Supabase Studio: https://supabase.com/dashboard/project/eqppnblxyxmslhgxiror → Table Editor → `leads`
+- SQL example: `SELECT created_at, source_page, email, zip, utm_campaign FROM leads ORDER BY created_at DESC LIMIT 100;`
+- CSV export: Table Editor → top-right "Export" → CSV
+- Weekly hand-off to campaign: filter `WHERE created_at >= now() - interval '7 days'`, export, send to June
+
+**Security model:** RLS is enabled with NO public policies. Only the `service_role` key (server-side only) can read or write. If the public `anon` key is ever exposed, it has zero access.
 
 ## Adding PII to CAPI for higher match quality
 

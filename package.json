@@ -1,0 +1,10 @@
+{
+  "name": "pratt-landing-pages",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Pratt for Mayor 2026 landing pages — static HTML + Vercel serverless CAPI",
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

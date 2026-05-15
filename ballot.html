@@ -13,6 +13,55 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
+<!-- ============================================================== -->
+<!-- META PIXEL + CONVERSIONS API                                   -->
+<!-- See SETUP.md for env-var configuration.                        -->
+<!-- ============================================================== -->
+<script>window.META_PIXEL_ID = "4456287721319223";</script>
+<script>
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+  n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+  document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  if (window.META_PIXEL_ID && window.META_PIXEL_ID.indexOf('__') !== 0) {
+    fbq('init', window.META_PIXEL_ID);
+    fbq('track', 'PageView');
+  }
+</script>
+<noscript><img height="1" width="1" style="display:none" alt="" src="https://www.facebook.com/tr?id=4456287721319223&ev=PageView&noscript=1"/></noscript>
+
+<script>
+  window.trackEvent = function(eventName, params, userData) {
+    params = params || {};
+    userData = userData || {};
+    var eventId = (crypto && crypto.randomUUID) ? crypto.randomUUID() :
+      ('xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c){
+        var r = Math.random()*16|0, v = c=='x' ? r : (r&0x3|0x8); return v.toString(16); }));
+    if (typeof fbq === 'function') {
+      if (userData.email || userData.zip || userData.phone) {
+        fbq('setUserProperties', window.META_PIXEL_ID, userData);
+      }
+      fbq('track', eventName, params, { eventID: eventId });
+    }
+    try {
+      fetch('/api/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          event_name: eventName,
+          event_id: eventId,
+          event_source_url: window.location.href,
+          custom_data: params,
+          user_data: userData
+        }),
+        keepalive: true
+      }).catch(function(){});
+    } catch(e) {}
+    return eventId;
+  };
+</script>
+
 <style>
   :root {
     --black: #0A0A0A;
@@ -533,7 +582,7 @@
     ],
   };
 
-  function renderResults(boxes) {
+  function renderResults(boxes, zip) {
     const results = document.getElementById('dropbox-results');
     const list = document.getElementById('dropbox-list');
     list.innerHTML = boxes.map(b => `
@@ -547,7 +596,14 @@
     results.classList.add('show');
     results.scrollIntoView({ behavior: 'smooth', block: 'center' });
     if (typeof gtag === 'function') gtag('event', 'ballot_action', { event_category: 'engagement' });
-    if (typeof fbq === 'function') fbq('track', 'Lead', { content_name: 'BallotFinder' });
+    if (typeof window.trackEvent === 'function') {
+      const userData = zip ? { zip: zip } : {};
+      window.trackEvent(
+        'Lead',
+        { content_name: 'BallotFinder', content_category: 'ballot_action' },
+        userData
+      );
+    }
   }
 
   function findDropBoxes(e) {
@@ -561,7 +617,7 @@
         { name: 'LA Central Library', addr: '630 W 5th St, Los Angeles, CA 90071', hrs: 'Open 24/7 through June 2 at 8pm' },
       ];
     }
-    renderResults(boxes);
+    renderResults(boxes, zip);
   }
 
   function useGeolocation() {
@@ -576,7 +632,7 @@
         renderResults([
           { name: 'Closest box: LA Central Library', addr: '630 W 5th St, Los Angeles, CA 90071', hrs: 'Open 24/7 through June 2 at 8pm' },
           { name: 'Backup: Echo Park Branch Library', addr: '1410 W Temple St, Los Angeles, CA 90026', hrs: 'Open 24/7 through June 2 at 8pm' },
-        ]);
+        ], '');
       },
       function(err) {
         alert("Couldn't get your location. Enter your ZIP above.");
@@ -587,6 +643,12 @@
   function submitSignup(e) {
     e.preventDefault();
     const form = e.target;
+    // Capture PII before replacing form HTML
+    const email = form.querySelector('input[type=email]')?.value || '';
+    const phone = form.querySelector('input[type=tel]')?.value || '';
+    const userData = {};
+    if (email) userData.email = email;
+    if (phone) userData.phone = phone;
     form.innerHTML = `
       <div style="background: var(--gold); color: var(--black); padding: 28px; border-radius: 6px;">
         <div style="font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 900; margin-bottom: 6px;">Reminder set.</div>
@@ -594,7 +656,10 @@
       </div>
     `;
     if (typeof gtag === 'function') gtag('event', 'sign_up', { event_category: 'engagement' });
-    if (typeof fbq === 'function') fbq('track', 'Lead', { content_name: 'BallotReminder' });
+    if (typeof window.trackEvent === 'function') {
+      window.trackEvent('Lead', { content_name: 'BallotReminder', content_category: 'signup' }, userData);
+      window.trackEvent('CompleteRegistration', { content_name: 'BallotReminder' }, userData);
+    }
   }
 </script>
 

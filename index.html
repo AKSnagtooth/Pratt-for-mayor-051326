@@ -16,9 +16,66 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-<!-- Tracking placeholders (uncomment and configure on launch) -->
-<!-- <script>// Meta Pixel goes here</script> -->
-<!-- <script>// Google Tag (gtag) goes here</script> -->
+<!-- ============================================================== -->
+<!-- META PIXEL + CONVERSIONS API                                   -->
+<!-- Pixel ID is injected at build/deploy time via env vars.        -->
+<!-- See SETUP.md for configuration.                                -->
+<!-- ============================================================== -->
+<script>
+  window.META_PIXEL_ID = "4456287721319223"; // replaced by Vercel build, or set inline before deploy
+</script>
+<!-- Meta Pixel Code -->
+<script>
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+  n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+  document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  if (window.META_PIXEL_ID && window.META_PIXEL_ID.indexOf('__') !== 0) {
+    fbq('init', window.META_PIXEL_ID);
+    fbq('track', 'PageView');
+  }
+</script>
+<noscript><img height="1" width="1" style="display:none" alt="" src="https://www.facebook.com/tr?id=4456287721319223&ev=PageView&noscript=1"/></noscript>
+<!-- End Meta Pixel Code -->
+
+<!-- Unified Pixel + CAPI tracker (deduped via event_id) -->
+<script>
+  window.trackEvent = function(eventName, params, userData) {
+    params = params || {};
+    userData = userData || {};
+    // Generate a UUIDv4-ish event_id for deduplication
+    var eventId = (crypto && crypto.randomUUID) ? crypto.randomUUID() :
+      ('xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c){
+        var r = Math.random()*16|0, v = c=='x' ? r : (r&0x3|0x8); return v.toString(16); }));
+    // 1) Client-side (Browser Pixel) — pass user data so Advanced Matching can hash it
+    if (typeof fbq === 'function') {
+      if (userData.email || userData.zip || userData.phone) {
+        // Setting fbq user data so it's included with this event
+        fbq('setUserProperties', window.META_PIXEL_ID, userData);
+      }
+      fbq('track', eventName, params, { eventID: eventId });
+    }
+    // 2) Server-side (Conversions API via Vercel serverless function)
+    try {
+      fetch('/api/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          event_name: eventName,
+          event_id: eventId,
+          event_source_url: window.location.href,
+          custom_data: params,
+          user_data: userData
+        }),
+        keepalive: true
+      }).catch(function(){});
+    } catch(e) {}
+    return eventId;
+  };
+</script>
+
+<!-- Google Tag (gtag) placeholder — install via GTM container or replace with gtag base snippet at launch -->
 
 <style>
   :root {
@@ -985,16 +1042,28 @@
     results.classList.add('show');
     // Scroll to results on mobile
     results.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    // Fire conversion event
+    // Fire conversion event (Pixel + CAPI deduped)
     if (typeof gtag === 'function') gtag('event', 'ballot_action', { event_category: 'engagement', value: 1 });
-    if (typeof fbq === 'function') fbq('track', 'Lead', { content_name: 'BallotFinder' });
+    if (typeof window.trackEvent === 'function') {
+      window.trackEvent(
+        'Lead',
+        { content_name: 'BallotFinder', content_category: 'ballot_action' },
+        { zip: zip }
+      );
+    }
   }
 
   // ===== SIGNUP FORM SUBMISSION =====
   function submitSignup(e) {
     e.preventDefault();
-    // In production, post to the campaign CRM (Action Network, NGP VAN, etc.)
     const form = e.target;
+    // Capture PII before replacing form HTML
+    const email = form.querySelector('input[type=email]')?.value || '';
+    const phone = form.querySelector('input[type=tel]')?.value || '';
+    const userData = {};
+    if (email) userData.email = email;
+    if (phone) userData.phone = phone;
+    // In production, post to the campaign CRM (Action Network, NGP VAN, etc.)
     form.innerHTML = `
       <div style="background: var(--gold); color: var(--black); padding: 32px; border-radius: 6px;">
         <div style="font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 900; margin-bottom: 8px;">You're in.</div>
@@ -1002,7 +1071,10 @@
       </div>
     `;
     if (typeof gtag === 'function') gtag('event', 'sign_up', { event_category: 'engagement', value: 1 });
-    if (typeof fbq === 'function') fbq('track', 'Lead', { content_name: 'EmailSignup' });
+    if (typeof window.trackEvent === 'function') {
+      window.trackEvent('Lead', { content_name: 'EmailSignup', content_category: 'signup' }, userData);
+      window.trackEvent('CompleteRegistration', { content_name: 'EmailSignup' }, userData);
+    }
   }
 </script>
 

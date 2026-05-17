@@ -192,7 +192,26 @@ export default async function handler(req, res) {
       console.error('Supabase insert failed', r.status, data);
       return res.status(200).json({ ok: false, status: r.status });
     }
-    return res.status(200).json({ ok: true, id: Array.isArray(data) ? data[0]?.id : data?.id });
+    const newLeadId = Array.isArray(data) ? data[0]?.id : data?.id;
+
+    // Fire welcome email + SMS async — do not block the response.
+    // Welcome only fires when:
+    //   1. SEND_REMINDERS_SECRET is set (internal auth)
+    //   2. The lead has an email OR consent_sms + phone (handled by send-welcome itself)
+    if (newLeadId && process.env.SEND_REMINDERS_SECRET) {
+      const host = req.headers.host || 'prattformayor2026.com';
+      const proto = req.headers['x-forwarded-proto'] || 'https';
+      const welcomeUrl = `${proto}://${host}/api/send-welcome?secret=${encodeURIComponent(process.env.SEND_REMINDERS_SECRET)}`;
+      // Fire-and-forget: do not await, do not block, ignore errors
+      fetch(welcomeUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lead_id: newLeadId }),
+        keepalive: true
+      }).catch(err => console.error('Welcome trigger failed', err));
+    }
+
+    return res.status(200).json({ ok: true, id: newLeadId });
   } catch (err) {
     console.error('Lead capture error', err);
     return res.status(200).json({ ok: false, reason: 'fetch_failed' });

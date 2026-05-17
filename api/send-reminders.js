@@ -47,9 +47,12 @@ const SCHEDULE = {
 // MESSAGE TEMPLATES
 // SMS must include campaign identity + STOP/HELP for TCPA compliance.
 // =============================================================
+// FPPC disclaimer appended to every SMS. California political SMS requirement.
+const SMS_DISCLAIMER = ' Paid for by Pratt for Mayor 2026 FPPC#1485940. Reply STOP.';
+
 const TEMPLATES = {
   initial: {
-    sms: 'Pratt for Mayor 2026: Your LA ballot is in your mailbox. Mail it for Spencer by 6/2 (8 PM). Postage paid, drop in any USPS mailbox. Vote Pratt: https://prattformayor2026.com Reply STOP to opt out, HELP for help.',
+    sms: 'Pratt for Mayor 2026: Your LA ballot is in your mailbox. Mail it for Spencer by 6/2 (8 PM). Postage paid, drop in any USPS mailbox. https://prattformayor2026.com Reply HELP for help.' + SMS_DISCLAIMER,
     email: {
       subject: 'Your ballot is in your mailbox',
       preheader: 'Mail it for Spencer Pratt by June 2.',
@@ -60,7 +63,7 @@ const TEMPLATES = {
     }
   },
   week: {
-    sms: 'Pratt for Mayor 2026: One week left. Mail your ballot for Spencer Pratt by 6/2. Drop in any USPS mailbox, postage paid. https://prattformayor2026.com Reply STOP.',
+    sms: 'Pratt for Mayor 2026: One week left. Mail your ballot for Spencer by 6/2. Drop in any USPS mailbox, postage paid. https://prattformayor2026.com' + SMS_DISCLAIMER,
     email: {
       subject: 'One week to mail your ballot',
       preheader: 'Seven days until June 2.',
@@ -71,11 +74,11 @@ const TEMPLATES = {
     }
   },
   three_days: {
-    sms: 'Pratt for Mayor 2026: 3 days. Have you mailed your ballot? Spencer Pratt for Mayor. Drop in any USPS mailbox by 6/2 (8 PM). Reply STOP.',
+    sms: 'Pratt for Mayor 2026: 3 days. Have you mailed your ballot? Drop in any USPS mailbox by 6/2 (8 PM).' + SMS_DISCLAIMER,
     email: null
   },
   tomorrow: {
-    sms: 'Pratt for Mayor 2026: TOMORROW is election day. Mail your Spencer Pratt ballot by 8 PM, or vote in person at any LA County Vote Center. Find one: https://locator.lavote.gov/locations/vc Reply STOP.',
+    sms: 'Pratt for Mayor 2026: TOMORROW is election day. Mail your Spencer ballot by 8 PM, or vote in person at any LA Vote Center: https://locator.lavote.gov/locations/vc' + SMS_DISCLAIMER,
     email: {
       subject: 'Tomorrow: Election Day',
       preheader: 'Mail or drop your ballot by 8 PM tomorrow.',
@@ -86,7 +89,7 @@ const TEMPLATES = {
     }
   },
   election_day: {
-    sms: 'Pratt for Mayor 2026: TODAY is Election Day. Polls close 8 PM. Vote Spencer Pratt. Vote in person: https://locator.lavote.gov/locations/vc Reply STOP.',
+    sms: 'Pratt for Mayor 2026: TODAY is Election Day. Polls close 8 PM. Vote Spencer Pratt in person: https://locator.lavote.gov/locations/vc' + SMS_DISCLAIMER,
     email: {
       subject: 'Today: Polls close 8 PM',
       preheader: 'Today is election day. Vote Spencer Pratt.',

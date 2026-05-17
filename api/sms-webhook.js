@@ -139,20 +139,20 @@ export default async function handler(req, res) {
     // Twilio's Messaging Service handles the auto-confirmation reply if configured,
     // but we'll also send one as a fallback (no-op if Twilio already did).
     res.setHeader('Content-Type', 'text/xml');
-    return res.status(200).send(twiML('Pratt for Mayor 2026: You have been unsubscribed and will not receive further messages. Reply START to resubscribe.'));
+    return res.status(200).send(twiML('Pratt for Mayor 2026 FPPC#1485940: You have been unsubscribed and will not receive further messages. Reply START to resubscribe.'));
   }
 
   // START keyword (opt back in)
   if (START_KEYWORDS.includes(inboundUpper)) {
     await markOptedIn(from, SUPABASE_URL, SERVICE_KEY);
     res.setHeader('Content-Type', 'text/xml');
-    return res.status(200).send(twiML('Pratt for Mayor 2026: You are resubscribed. Mail your ballot for Spencer by 6/2. Reply STOP to opt out.'));
+    return res.status(200).send(twiML('Pratt for Mayor 2026 FPPC#1485940: You are resubscribed. Mail your ballot for Spencer by 6/2. Reply STOP to opt out.'));
   }
 
   // HELP keyword
   if (HELP_KEYWORDS.includes(inboundUpper)) {
     res.setHeader('Content-Type', 'text/xml');
-    return res.status(200).send(twiML('Pratt for Mayor 2026: Mail your ballot for Spencer by 6/2 (8 PM). Info: prattformayor2026.com. Reply STOP to opt out. Msg & data rates may apply.'));
+    return res.status(200).send(twiML('Pratt for Mayor 2026 FPPC#1485940: Mail your ballot for Spencer by 6/2 (8 PM). Info: prattformayor2026.com. Reply STOP to opt out. Msg & data rates may apply.'));
   }
 
   // Anything else: log & no auto-reply

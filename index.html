@@ -123,14 +123,24 @@
 <script>
   window.META_PIXEL_ID = "4456287721319223"; // replaced by Vercel build, or set inline before deploy
 </script>
-<!-- Meta Pixel Code -->
+<!-- Meta Pixel Code (gated by cookie consent) -->
 <script>
+  // Cookie-consent helper — returns false ONLY if user actively declined
+  window.prattTrackingAllowed = function() {
+    try {
+      var raw = localStorage.getItem('pratt-tracking-consent');
+      if (!raw) return true;
+      var c = JSON.parse(raw);
+      if (!c || !c.expires || c.expires < Date.now()) return true;
+      return c.value !== 'declined';
+    } catch(e) { return true; }
+  };
   !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
   n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
   n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
   t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
   document,'script','https://connect.facebook.net/en_US/fbevents.js');
-  if (window.META_PIXEL_ID && window.META_PIXEL_ID.indexOf('__') !== 0) {
+  if (window.META_PIXEL_ID && window.META_PIXEL_ID.indexOf('__') !== 0 && window.prattTrackingAllowed()) {
     fbq('init', window.META_PIXEL_ID);
     fbq('track', 'PageView');
   }
@@ -190,6 +200,10 @@
   };
 
   window.trackEvent = function(eventName, params, userData, eventIdOverride) {
+    // Skip all tracking events if user declined cookies
+    if (typeof window.prattTrackingAllowed === 'function' && !window.prattTrackingAllowed()) {
+      return null;
+    }
     params = params || {};
     userData = userData || {};
     var eventId = eventIdOverride || window.makeEventId();
@@ -931,6 +945,74 @@
   @media (max-width: 767px) {
     body { padding-bottom: 80px; }
   }
+
+  /* === COOKIE CONSENT BANNER === */
+  #pratt-cookie-banner {
+    position: fixed;
+    bottom: 96px;
+    left: 16px;
+    right: 16px;
+    max-width: 720px;
+    margin: 0 auto;
+    background: #1a1a1a;
+    color: var(--off-white);
+    border: 1px solid rgba(247, 107, 28, 0.45);
+    border-radius: 8px;
+    padding: 14px 18px;
+    z-index: 250;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  #pratt-cookie-banner[hidden] { display: none !important; }
+  .pratt-cookie-text { flex: 1; }
+  .pratt-cookie-text strong { color: var(--gold); }
+  .pratt-cookie-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .pratt-cookie-btn {
+    padding: 8px 14px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    border: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    min-height: 36px;
+  }
+  .pratt-cookie-btn-accept {
+    background: var(--gold);
+    color: var(--black);
+  }
+  .pratt-cookie-btn-accept:hover { background: var(--gold-light); }
+  .pratt-cookie-btn-decline {
+    background: transparent;
+    color: var(--gray-light);
+    border: 1px solid var(--gray-dark);
+  }
+  .pratt-cookie-btn-decline:hover { color: var(--white); border-color: var(--gold); }
+  .pratt-cookie-link {
+    color: var(--gold);
+    font-size: 11px;
+    text-decoration: underline;
+    margin-left: 4px;
+  }
+  @media (min-width: 768px) {
+    #pratt-cookie-banner {
+      flex-direction: row;
+      align-items: center;
+      bottom: 24px;
+      padding: 16px 22px;
+    }
+  }
 </style>
 </head>
 <body>
@@ -1221,6 +1303,63 @@
   </div>
   <a href="#ballot">Mail Now</a>
 </div>
+
+<!-- ============================================ -->
+<!-- COOKIE CONSENT BANNER -->
+<!-- ============================================ -->
+<div id="pratt-cookie-banner" role="dialog" aria-label="Cookie consent" hidden>
+  <div class="pratt-cookie-text">
+    <strong>🍪 Tracking notice.</strong> We use cookies and Meta Pixel to measure ad performance and remind you to mail your ballot. By continuing you accept this.
+  </div>
+  <div class="pratt-cookie-actions">
+    <button type="button" class="pratt-cookie-btn pratt-cookie-btn-accept" onclick="prattCookieAccept()">Accept</button>
+    <button type="button" class="pratt-cookie-btn pratt-cookie-btn-decline" onclick="prattCookieDecline()">Decline</button>
+    <a href="https://mayorpratt.com/privacy-policy/" target="_blank" rel="noopener" class="pratt-cookie-link">Privacy Policy</a>
+  </div>
+</div>
+
+<script>
+  (function(){
+    var KEY = 'pratt-tracking-consent';
+    var EXPIRY_MS = 365 * 24 * 60 * 60 * 1000; // 12 months
+    function getConsent() {
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (!raw) return null;
+        var parsed = JSON.parse(raw);
+        if (!parsed.expires || parsed.expires < Date.now()) {
+          localStorage.removeItem(KEY);
+          return null;
+        }
+        return parsed.value;
+      } catch(e) { return null; }
+    }
+    function setConsent(value) {
+      try {
+        localStorage.setItem(KEY, JSON.stringify({
+          value: value,
+          expires: Date.now() + EXPIRY_MS,
+          timestamp: new Date().toISOString()
+        }));
+      } catch(e) {}
+    }
+    window.prattCookieAccept = function() {
+      setConsent('accepted');
+      var b = document.getElementById('pratt-cookie-banner');
+      if (b) b.hidden = true;
+    };
+    window.prattCookieDecline = function() {
+      setConsent('declined');
+      var b = document.getElementById('pratt-cookie-banner');
+      if (b) b.hidden = true;
+    };
+    // Show banner only if no recorded choice
+    if (!getConsent()) {
+      var banner = document.getElementById('pratt-cookie-banner');
+      if (banner) banner.hidden = false;
+    }
+  })();
+</script>
 
 <!-- ============================================ -->
 <!-- SCRIPTS -->

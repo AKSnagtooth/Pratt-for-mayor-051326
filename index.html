@@ -107,6 +107,9 @@
 }
 </script>
 
+<!-- Cloudflare Turnstile (captcha) -->
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -164,9 +167,18 @@
     try {
       var url = new URL(window.location.href);
       var attribution = window.readUtmsAndClickIds();
+      // Read Turnstile token if widget is mounted and configured
+      var turnstileToken = '';
+      try {
+        if (typeof turnstile !== 'undefined') {
+          var tokenInput = document.querySelector('[name="cf-turnstile-response"]');
+          if (tokenInput) turnstileToken = tokenInput.value || '';
+        }
+      } catch(e) {}
       var body = Object.assign({
         event_source_url: window.location.href,
-        referrer: document.referrer
+        referrer: document.referrer,
+        turnstile_token: turnstileToken
       }, attribution, payload);
       fetch('/api/lead', {
         method: 'POST',
@@ -509,6 +521,74 @@
   }
   .zip-input:focus { box-shadow: 0 0 0 3px rgba(247, 107, 28, 0.4); }
   .zip-input::placeholder { letter-spacing: 0.05em; color: var(--gray); }
+
+  /* === MAIL-IN STEPS === */
+  .mail-steps {
+    max-width: 880px;
+    margin: 40px auto 28px;
+    display: grid;
+    gap: 16px;
+    grid-template-columns: 1fr;
+    text-align: left;
+  }
+  .mail-step {
+    background: linear-gradient(180deg, rgba(247, 107, 28, 0.08) 0%, rgba(247, 107, 28, 0.02) 100%);
+    border: 1px solid rgba(247, 107, 28, 0.25);
+    border-radius: 8px;
+    padding: 24px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .mail-step-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 38px;
+    font-weight: 900;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .mail-step-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--white);
+    line-height: 1.15;
+  }
+  .mail-step p {
+    color: var(--gray-light);
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  .mail-help {
+    color: var(--gray-light);
+    font-size: 14px;
+    margin-top: 8px;
+  }
+  .btn-inline-link {
+    background: none;
+    border: 0;
+    color: var(--gold);
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .btn-inline-link:hover { color: var(--gold-light); }
+  .dropbox-section {
+    max-width: 600px;
+    margin: 40px auto 0;
+    padding: 32px 24px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(247, 107, 28, 0.15);
+    border-radius: 8px;
+    text-align: center;
+  }
+  @media (min-width: 768px) {
+    .mail-steps { grid-template-columns: repeat(3, 1fr); }
+  }
 
   .dropbox-results {
     background: var(--white);
@@ -854,7 +934,7 @@
 <!-- ============================================ -->
 <div class="urgent-banner">
   <span>📬</span>YOUR BALLOT IS IN YOUR MAILBOX.<span>·</span>
-  <a href="#ballot">FIND YOUR DROP BOX →</a>
+  <a href="#ballot">MAIL IT BACK →</a>
 </div>
 
 <!-- ============================================ -->
@@ -868,7 +948,7 @@
     <nav class="nav-desktop">
       <a href="#stakes">The Stakes</a>
       <a href="#plan">The Plan</a>
-      <a href="#ballot">Find Drop Box</a>
+      <a href="#ballot">Mail Your Ballot</a>
       <a href="#signup">Join Us</a>
     </nav>
     <a href="https://secure.anedot.com/pratt-for-mayor/49b6621f-b6b5-47cc-a713-064b339d8d70?recurring=true" class="donate-btn">Donate</a>
@@ -895,7 +975,7 @@
 
     <!-- CTAs -->
     <div class="cta-group">
-      <a href="#ballot" class="btn-primary">Find Your Drop Box →</a>
+      <a href="#ballot" class="btn-primary">Mail Your Ballot →</a>
       <a href="#signup" class="btn-secondary">Get Voting Reminders</a>
     </div>
 
@@ -910,33 +990,59 @@
 <!-- ============================================ -->
 <section class="ballot-finder" id="ballot">
   <div class="ballot-inner">
-    <div class="section-eyebrow">Mail Your Ballot</div>
-    <h2 class="section-h2">Find your drop box.</h2>
-    <p class="section-sub">Enter your ZIP. We'll show you the closest LA County drop boxes. Open 24/7 through June 2 at 8pm.</p>
+    <div class="section-eyebrow">Vote By Mail · 3 Steps</div>
+    <h2 class="section-h2">Mail it. Done.</h2>
+    <p class="section-sub">Your ballot is in your mailbox. Postage is prepaid. Mail by June 2 at 8 PM.</p>
 
-    <form class="zip-form" id="zip-form" onsubmit="findDropBoxes(event)">
-      <input
-        type="text"
-        class="zip-input"
-        id="zip-input"
-        placeholder="ENTER YOUR ZIP"
-        inputmode="numeric"
-        pattern="[0-9]{5}"
-        maxlength="5"
-        autocomplete="postal-code"
-        aria-label="Enter your ZIP code"
-        required
-      />
-      <button type="submit" class="btn-primary">Find Boxes</button>
-    </form>
+    <div class="mail-steps">
+      <div class="mail-step">
+        <div class="mail-step-num">1</div>
+        <div class="mail-step-title">Open your ballot</div>
+        <p>It arrived in your mailbox in early May. Look for the official LA County envelope.</p>
+      </div>
+      <div class="mail-step">
+        <div class="mail-step-num">2</div>
+        <div class="mail-step-title">Vote Spencer Pratt</div>
+        <p>Fill in the bubble for Spencer Pratt for Mayor. Sign and date the back of the return envelope.</p>
+      </div>
+      <div class="mail-step">
+        <div class="mail-step-num">3</div>
+        <div class="mail-step-title">Drop in any mailbox</div>
+        <p>Postage is prepaid. Drop in any USPS mailbox. Must be postmarked by June 2.</p>
+      </div>
+    </div>
 
-    <div class="dropbox-results" id="dropbox-results">
-      <h3>Drop boxes near you:</h3>
-      <div id="dropbox-list"></div>
-      <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #eee; font-size: 13px; color: var(--gray-dark);">
-        <strong>Tip:</strong> Mail it back today. Postage is prepaid. Or drop at any box above by Tuesday, June 2 at 8pm.
-        <br><br>
-        <a href="https://locator.lavote.gov/locations/vc?id=4338&culture=en" target="_blank" rel="noopener" style="color: var(--gold-dark); font-weight: 700;">→ View all LA County drop boxes (official site)</a>
+    <p class="mail-help">
+      Can't mail it? <button onclick="toggleDropbox()" class="btn-inline-link" type="button">Find a drop box →</button>
+    </p>
+
+    <div id="dropbox-section" class="dropbox-section" style="display:none;">
+      <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.2em; color: var(--gold); margin-bottom: 14px;">Alternative · Drop Box Finder</div>
+      <h3 style="font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 800; color: var(--white); margin-bottom: 8px;">Find a drop box near you</h3>
+      <p style="font-size: 14px; color: var(--gray-light); margin-bottom: 24px;">Use only if you cannot mail your ballot. Open 24/7 through June 2 at 8 PM. Vote in person at a Vote Center opens May 23.</p>
+
+      <form class="zip-form" id="zip-form" onsubmit="findDropBoxes(event)">
+        <input
+          type="text"
+          class="zip-input"
+          id="zip-input"
+          placeholder="ENTER YOUR ZIP"
+          inputmode="numeric"
+          pattern="[0-9]{5}"
+          maxlength="5"
+          autocomplete="postal-code"
+          aria-label="Enter your ZIP code"
+          required
+        />
+        <button type="submit" class="btn-primary">Find Drop Box</button>
+      </form>
+
+      <div class="dropbox-results" id="dropbox-results">
+        <h3>Drop boxes near you:</h3>
+        <div id="dropbox-list"></div>
+        <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #eee; font-size: 13px; color: var(--gray-dark);">
+          <a href="https://locator.lavote.gov/locations/vc?id=4338&culture=en" target="_blank" rel="noopener" style="color: var(--gold-dark); font-weight: 700;">→ View all LA County drop boxes (official site)</a>
+        </div>
       </div>
     </div>
   </div>
@@ -957,7 +1063,7 @@
       <div class="stake-body">
         <div class="stake-stat">0.5%</div>
         <div class="stake-title">of Palisades homes rebuilt</div>
-        <p>16 months after the fire. 6,800 homes destroyed. Karen Bass was in Ghana the day they burned. The rebuild is worse than Paradise, Santa Rosa, even its sister fire Altadena.</p>
+        <p>16 months after the fire. 6,800 homes destroyed. Karen Bass was in Ghana the day they burned. The rebuild is far behind Paradise after Camp Fire and Santa Rosa after Tubbs.</p>
       </div>
     </div>
     <div class="stake-card">
@@ -1051,8 +1157,9 @@
       <input type="email" class="form-input" placeholder="Email address" autocomplete="email" required />
       <input type="tel" class="form-input" placeholder="Mobile (optional, for ballot reminders)" autocomplete="tel" />
       <button type="submit" class="btn-primary" style="margin-top: 8px;">Send Me Reminders</button>
+      <div class="cf-turnstile" data-sitekey="__TURNSTILE_SITE_KEY__" data-theme="dark" style="margin: 12px 0;"></div>
       <div class="form-consent">
-        By submitting, you consent to receive email and text messages from Pratt for Mayor 2026, including automated messages. Message and data rates may apply. Reply STOP to opt out. <a href="https://mayorpratt.com/privacy-policy/" target="_blank">Privacy Policy</a>.
+        By submitting, you consent to receive recurring automated marketing emails and text messages from Pratt for Mayor 2026 at the contact info provided. Consent is not a condition of any purchase. Message frequency varies. Message and data rates may apply. Reply STOP to opt out, HELP for help. <a href="https://mayorpratt.com/privacy-policy/" target="_blank" rel="noopener">Privacy Policy</a>.
       </div>
     </form>
   </div>
@@ -1062,8 +1169,8 @@
 <!-- FINAL CTA -->
 <!-- ============================================ -->
 <section class="final-cta">
-  <h2>Save LA. Vote by June 2.</h2>
-  <a href="#ballot" class="btn-primary">Find Your Drop Box</a>
+  <h2>Save LA. Mail your ballot by June 2.</h2>
+  <a href="#ballot" class="btn-primary">How to Mail Your Ballot</a>
 </section>
 
 <!-- ============================================ -->
@@ -1093,9 +1200,9 @@
 <div class="mobile-sticky">
   <div class="mobile-sticky-text">
     <strong>Your ballot.</strong>
-    20 days left.
+    Mail it by June 2.
   </div>
-  <a href="#ballot">Find Drop Box</a>
+  <a href="#ballot">Mail Now</a>
 </div>
 
 <!-- ============================================ -->
@@ -1122,6 +1229,16 @@
   }
   tick();
   setInterval(tick, 1000);
+
+  // ===== TOGGLE DROP BOX FALLBACK =====
+  function toggleDropbox() {
+    const section = document.getElementById('dropbox-section');
+    const isHidden = section.style.display === 'none' || !section.style.display;
+    section.style.display = isHidden ? 'block' : 'none';
+    if (isHidden) {
+      setTimeout(() => section.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+    }
+  }
 
   // ===== MOCK DROP BOX DATABASE =====
   // Real LA County drop box locations (sample). On production, plug into LA County RR/CC data feed.

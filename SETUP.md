@@ -39,6 +39,38 @@ Add the following in Vercel dashboard → `pratt-landing` → **Settings → Env
 
 > Without these, `/api/lead` returns `{ok:false, reason:"supabase_not_configured"}` — Pixel tracking still works, but signups are NOT captured. Get this set before turning on paid traffic.
 
+### Cloudflare Turnstile (captcha — bot/spam protection)
+
+| Name | Value | Where to get it |
+|---|---|---|
+| `TURNSTILE_SECRET_KEY` | Secret key from Cloudflare Turnstile dashboard | https://dash.cloudflare.com/?to=/:account/turnstile → Add widget → copy the **Secret Key** |
+| `RATE_LIMIT_PER_HOUR` | *(optional)* number, default `5` | Max number of leads accepted from a single IP per hour |
+
+**Plus a one-time HTML edit:** the public Turnstile **Site Key** must replace the placeholder `__TURNSTILE_SITE_KEY__` in all 3 HTML files. Run this in your terminal (replace `YOUR_SITE_KEY` with the actual key):
+
+```bash
+cd "/Users/aleksanderkocev/Snagtooth Meta Ads/Spencer Pratt/landing-pages"
+sed -i '' 's/__TURNSTILE_SITE_KEY__/YOUR_SITE_KEY/g' index.html ballot.html save-la.html
+git add -A && git commit -m "Add Turnstile site key" && git push
+```
+
+**Step-by-step Cloudflare Turnstile setup:**
+
+1. Go to https://dash.cloudflare.com/?to=/:account/turnstile (free, no card required)
+2. Click **Add widget**
+3. Widget name: `Pratt Landing Pages`
+4. Hostnames: `prattformayor2026.com`
+5. Widget mode: **Managed** (lets Cloudflare decide when to challenge — invisible to most users)
+6. Click **Create**
+7. Copy both keys:
+   - **Site Key** (public) → use in `sed` command above
+   - **Secret Key** (private) → set as `TURNSTILE_SECRET_KEY` env var in Vercel
+8. Redeploy via `vercel --prod` or `git push` (auto-deploy)
+
+**Graceful degradation:** If `TURNSTILE_SECRET_KEY` is not set in Vercel, the captcha verification is skipped — the form still works. This means you can deploy this code TODAY and add Turnstile WHEN you have the keys.
+
+> Without Turnstile, the form is protected only by honeypot fields. ~80% of bots blocked. With Turnstile: ~99%.
+
 ## Step 2 — Redeploy
 
 From the `landing-pages/` folder on your local machine:

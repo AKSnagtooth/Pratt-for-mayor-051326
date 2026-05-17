@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Don't index API endpoints
+Disallow: /api/
+
+# Sitemap location
+Sitemap: https://prattformayor2026.com/sitemap.xml

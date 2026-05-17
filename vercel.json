@@ -5,8 +5,26 @@
     "api/track.js": {
       "memory": 256,
       "maxDuration": 10
+    },
+    "api/lead.js": {
+      "memory": 256,
+      "maxDuration": 10
+    },
+    "api/send-reminders.js": {
+      "memory": 512,
+      "maxDuration": 300
+    },
+    "api/sms-webhook.js": {
+      "memory": 256,
+      "maxDuration": 10
     }
   },
+  "crons": [
+    {
+      "path": "/api/send-reminders",
+      "schedule": "0 17 * * *"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

@@ -71,6 +71,108 @@ git add -A && git commit -m "Add Turnstile site key" && git push
 
 > Without Turnstile, the form is protected only by honeypot fields. ~80% of bots blocked. With Turnstile: ~99%.
 
+### Twilio (SMS reminders)
+
+| Name | Value | Where to get it |
+|---|---|---|
+| `TWILIO_ACCOUNT_SID` | Starts with `AC...` | Twilio console homepage |
+| `TWILIO_AUTH_TOKEN` | (secret) | Same homepage, "Auth Token" field |
+| `TWILIO_PHONE_NUMBER` | E.164 like `+12135550100` | Twilio → Phone Numbers → Buy a number (US local, LA area code) |
+| `TWILIO_MESSAGING_SERVICE_SID` | Starts with `MG...` | Twilio → Messaging → Services → Create Messaging Service. Required for political SMS A2P 10DLC. |
+| `SEND_REMINDERS_SECRET` | Generate a long random string yourself | Used for manual cron triggers via `?secret=...` |
+
+A2P 10DLC registration is REQUIRED for US political SMS. Without it, your messages will be blocked by carriers.
+
+Walk-through:
+
+1. Sign up: https://www.twilio.com/try-twilio
+2. Buy a number: Phone Numbers → Buy a Number. Pick LA area code (213, 310, 323, 424, 818). Cost: ~$1.15/month.
+3. Create a Messaging Service: Console → Messaging → Services → Create Messaging Service. Name "Pratt for Mayor 2026". Use case "Notifications". Add your phone number as a sender.
+4. A2P 10DLC Brand registration: Messaging → Regulatory Compliance → A2P 10DLC → Brand Registration. Use FPPC ID 1485940 as tax ID equivalent (mark as Political Committee). Verification takes 1-3 business days.
+5. A2P 10DLC Campaign registration: Same section → Campaign Use Case → Political. Description: "SMS reminders to registered LA County voters who opted in at prattformayor2026.com for the June 2, 2026 mayoral primary election." Sample messages: paste 2-3 templates from `/api/send-reminders.js`. Opt-in process: "User submits form on prattformayor2026.com with explicit consent checkbox." Opt-out keywords: STOP, UNSUBSCRIBE, QUIT, END, CANCEL. Help: HELP, INFO.
+6. Configure Messaging Service webhook: Messaging Service → Integration → "Incoming Messages" webhook. URL: `https://prattformayor2026.com/api/sms-webhook`. Method POST. Same URL for "Status Callback" (delivery tracking).
+7. Copy the credentials and add the 5 Twilio env vars to Vercel.
+
+> Timeline: Brand verification + campaign approval = 1-7 business days for political. Start TODAY if you want SMS live by the first scheduled send (May 20).
+
+### Resend (Email reminders)
+
+| Name | Value | Where to get it |
+|---|---|---|
+| `RESEND_API_KEY` | Starts with `re_...` | https://resend.com → API Keys |
+| `RESEND_FROM_EMAIL` | `Spencer Pratt <reminders@prattformayor2026.com>` | Must be a verified domain in Resend |
+
+Walk-through:
+
+1. Sign up: https://resend.com/signup (free tier = 3,000 emails/month).
+2. Add domain: Domains → Add Domain → `prattformayor2026.com`.
+3. Add DNS records Resend gives you (4 records: SPF, DKIM x2, MX) in Vercel → Settings → Domains → prattformayor2026.com → DNS Records.
+4. Pro plan ($20/mo) if you expect >3K emails/month. With 5,000 leads × 4 emails = 20,000, you need Pro.
+5. Create API key: API Keys → Create → name "Pratt Campaign", permission "Sending access".
+6. Copy the key and set `RESEND_API_KEY` in Vercel.
+
+### Cron schedule (already configured in vercel.json)
+
+A single daily cron runs at 17:00 UTC = 10:00 AM PDT:
+```json
+"crons": [
+  { "path": "/api/send-reminders", "schedule": "0 17 * * *" }
+]
+```
+
+The function self-determines which message to send based on today's date (PT):
+
+| Date (PT) | Message key | Channels |
+|---|---|---|
+| 2026-05-20 (Tue) | `initial` | SMS + Email |
+| 2026-05-26 (Mon) | `week` | SMS + Email |
+| 2026-05-30 (Fri) | `three_days` | SMS only |
+| 2026-06-01 (Mon) | `tomorrow` | SMS + Email |
+| 2026-06-02 (Tue) | `election_day` | SMS + Email |
+
+On any other date the function returns `{ ok: true, info: 'no_send_today' }` and does nothing.
+
+### Test the reminder system before May 20
+
+After all env vars are set, manually trigger sends:
+
+```bash
+# Dry-run (no actual sends, just shows what WOULD be sent)
+curl "https://prattformayor2026.com/api/send-reminders?secret=YOUR_SECRET&dry=1&force=initial"
+
+# Real send to all eligible leads, FORCED to use the 'initial' template
+curl "https://prattformayor2026.com/api/send-reminders?secret=YOUR_SECRET&force=initial"
+
+# What the daily cron will do today (no force, uses today's date)
+curl "https://prattformayor2026.com/api/send-reminders?secret=YOUR_SECRET"
+```
+
+Recommended pre-launch test: Sign yourself up at prattformayor2026.com (opt in to SMS + email), then run the dry-run + force commands to verify delivery to your own phone/email.
+
+### Monitoring queries (Supabase SQL editor)
+
+```sql
+-- Today's sends by status
+SELECT message_key, channel, status, count(*)
+FROM lead_messages
+WHERE created_at >= now() - interval '24 hours'
+GROUP BY 1, 2, 3
+ORDER BY 1, 2, 3;
+
+-- Failures
+SELECT id, lead_id, channel, message_key, recipient, error_message, created_at
+FROM lead_messages
+WHERE status = 'failed'
+ORDER BY created_at DESC
+LIMIT 50;
+
+-- Opt-out count
+SELECT count(*) FILTER (WHERE opted_out_sms) as sms_optouts,
+       count(*) FILTER (WHERE opted_out_email) as email_optouts,
+       count(*) as total_leads
+FROM leads;
+```
+
 ## Step 2 — Redeploy
 
 From the `landing-pages/` folder on your local machine:

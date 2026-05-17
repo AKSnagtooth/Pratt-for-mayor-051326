@@ -100,7 +100,7 @@
       "@id": "https://prattformayor2026.com/#site",
       "url": "https://prattformayor2026.com/",
       "name": "Pratt for Mayor 2026",
-      "description": "Spencer Pratt for Mayor of Los Angeles — Vote June 2, 2026.",
+      "description": "Spencer Pratt for Mayor of Los Angeles. Vote June 2, 2026.",
       "publisher": { "@id": "https://prattformayor2026.com/#org" }
     }
   ]
@@ -193,7 +193,7 @@
     params = params || {};
     userData = userData || {};
     var eventId = eventIdOverride || window.makeEventId();
-    // 1) Client-side (Browser Pixel) — pass user data so Advanced Matching can hash it
+    // 1) Client-side (Browser Pixel). Pass user data so Advanced Matching can hash it
     if (typeof fbq === 'function') {
       if (userData.email || userData.zip || userData.phone) {
         // Setting fbq user data so it's included with this event
@@ -220,7 +220,7 @@
   };
 </script>
 
-<!-- Google Tag (gtag) placeholder — install via GTM container or replace with gtag base snippet at launch -->
+<!-- Google Tag (gtag) placeholder. Install via GTM container or replace with gtag base snippet at launch -->
 
 <style>
   :root {
@@ -998,7 +998,7 @@
   <div class="ballot-inner">
     <div class="section-eyebrow">Vote By Mail · 3 Steps</div>
     <h2 class="section-h2">Mail it. Done.</h2>
-    <p class="section-sub">Your ballot is in your mailbox. Postage is prepaid. Vote Spencer Pratt for Mayor — mail by June 2 at 8 PM.</p>
+    <p class="section-sub">Your ballot is in your mailbox. Postage is prepaid. Vote Spencer Pratt for Mayor. Mail by June 2, 8 PM.</p>
 
     <div class="mail-steps">
       <div class="mail-step">
@@ -1312,7 +1312,7 @@
     // Fire conversion event (Pixel + CAPI deduped)
     if (typeof gtag === 'function') gtag('event', 'ballot_action', { event_category: 'engagement', value: 1 });
     var eventId = window.makeEventId();
-    // Store the ballot-finder lead in Supabase (ZIP only — no email captured here)
+    // Store the ballot-finder lead in Supabase (ZIP only, no email captured here)
     window.submitLead({
       source_page: 'home',
       form_type: 'ballot_finder',
@@ -1356,7 +1356,7 @@
         <div style="font-size: 16px;">We'll text you to mail your ballot. Tell three friends.</div>
       </div>
     `;
-    // 3) Fire conversion events — Lead uses same event_id as the Supabase row
+    // 3) Fire conversion events. Lead uses same event_id as the Supabase row
     if (typeof gtag === 'function') gtag('event', 'sign_up', { event_category: 'engagement', value: 1 });
     if (typeof window.trackEvent === 'function') {
       window.trackEvent('Lead', { content_name: 'EmailSignup', content_category: 'signup' }, userData, eventId);

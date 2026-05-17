@@ -21,6 +21,16 @@
 //   For manual testing: set SEND_REMINDERS_SECRET and pass ?secret=... in the URL.
 // ============================================================
 
+import crypto from 'node:crypto';
+
+function unsubscribeUrl(email) {
+  const secret = process.env.UNSUBSCRIBE_HMAC_SECRET;
+  if (!secret) return 'https://prattformayor2026.com/';
+  const e = (email || '').toLowerCase().trim();
+  const t = crypto.createHmac('sha256', secret).update(e).digest('hex');
+  return `https://prattformayor2026.com/api/unsubscribe?email=${encodeURIComponent(e)}&t=${t}`;
+}
+
 // =============================================================
 // SCHEDULE: which message to send on which date
 // Dates are in America/Los_Angeles timezone (campaign timezone).
@@ -219,6 +229,8 @@ async function sendEmail(to, subject, preheader, heading, bodyHtml, ctaText, cta
   const from = process.env.RESEND_FROM_EMAIL;
   if (!apiKey || !from) return { ok: false, error: 'resend_not_configured' };
 
+  const unsubUrl = unsubscribeUrl(to);
+
   const fullHtml = `<!doctype html><html><body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background:#0A0A0A; color:#F5F5F5; margin:0; padding:0;">
 <span style="display:none; max-height:0; overflow:hidden;">${preheader}</span>
 <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0A0A0A;">
@@ -234,7 +246,7 @@ async function sendEmail(to, subject, preheader, heading, bodyHtml, ctaText, cta
         Paid for by Pratt for Mayor 2026 (FPPC ID 1485940)<br>
         970 Seacoast Drive, Suite 7, Imperial Beach, CA 91932<br><br>
         You're receiving this because you signed up at prattformayor2026.com.<br>
-        <a href="{{unsubscribe_url}}" style="color:#F76B1C;">Unsubscribe</a> &nbsp;·&nbsp;
+        <a href="${unsubUrl}" style="color:#F76B1C;">Unsubscribe</a> &nbsp;·&nbsp;
         <a href="https://mayorpratt.com/privacy-policy/" style="color:#F76B1C;">Privacy Policy</a>
       </td></tr>
     </table>
@@ -253,7 +265,12 @@ async function sendEmail(to, subject, preheader, heading, bodyHtml, ctaText, cta
       to: [to],
       subject,
       html: fullHtml,
-      headers: { 'List-Unsubscribe': `<mailto:unsubscribe@prattformayor2026.com>, <https://prattformayor2026.com/api/unsubscribe?email=${encodeURIComponent(to)}>` }
+      headers: {
+        // One-click unsubscribe for Gmail/Outlook
+        // (RFC 8058: List-Unsubscribe-Post enables one-click via POST)
+        'List-Unsubscribe': `<${unsubUrl}>, <mailto:unsubscribe@prattformayor2026.com?subject=Unsubscribe>`,
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
+      }
     })
   });
   const json = await r.json();

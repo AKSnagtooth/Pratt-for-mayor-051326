@@ -101,6 +101,7 @@ Walk-through:
 |---|---|---|
 | `RESEND_API_KEY` | Starts with `re_...` | https://resend.com → API Keys |
 | `RESEND_FROM_EMAIL` | `Spencer Pratt <reminders@prattformayor2026.com>` | Must be a verified domain in Resend |
+| `UNSUBSCRIBE_HMAC_SECRET` | Generate a long random string yourself (32+ chars) | Signs the unsubscribe URLs so attackers can't unsubscribe other people |
 
 Walk-through:
 

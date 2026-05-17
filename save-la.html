@@ -67,6 +67,35 @@
 </script>
 <noscript><img height="1" width="1" style="display:none" alt="" src="https://www.facebook.com/tr?id=4456287721319223&ev=PageView&noscript=1"/></noscript>
 
+<!-- Google Analytics 4 (gtag.js) with consent mode -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-NKEHC011N6"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('consent', 'default', {
+    'ad_storage': 'granted', 'ad_user_data': 'granted',
+    'ad_personalization': 'granted', 'analytics_storage': 'granted'
+  });
+  try {
+    var _gc = localStorage.getItem('pratt-tracking-consent');
+    if (_gc) {
+      var _gp = JSON.parse(_gc);
+      if (_gp && _gp.value === 'declined' && _gp.expires > Date.now()) {
+        gtag('consent', 'update', {
+          'ad_storage': 'denied', 'ad_user_data': 'denied',
+          'ad_personalization': 'denied', 'analytics_storage': 'denied'
+        });
+      }
+    }
+  } catch(e) {}
+  gtag('config', 'G-NKEHC011N6', { anonymize_ip: true });
+</script>
+
+<!-- Vercel Analytics + Speed Insights -->
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
+
 <script>
   window.makeEventId = function() {
     return (window.crypto && crypto.randomUUID) ? crypto.randomUUID() :
@@ -1112,8 +1141,20 @@
         localStorage.setItem(KEY, JSON.stringify({ value: value, expires: Date.now() + EXPIRY_MS, timestamp: new Date().toISOString() }));
       } catch(e) {}
     }
-    window.prattCookieAccept = function() { setConsent('accepted'); var b = document.getElementById('pratt-cookie-banner'); if (b) b.hidden = true; };
-    window.prattCookieDecline = function() { setConsent('declined'); var b = document.getElementById('pratt-cookie-banner'); if (b) b.hidden = true; };
+    window.prattCookieAccept = function() {
+      setConsent('accepted');
+      if (typeof gtag === 'function') {
+        gtag('consent', 'update', { 'ad_storage': 'granted', 'ad_user_data': 'granted', 'ad_personalization': 'granted', 'analytics_storage': 'granted' });
+      }
+      var b = document.getElementById('pratt-cookie-banner'); if (b) b.hidden = true;
+    };
+    window.prattCookieDecline = function() {
+      setConsent('declined');
+      if (typeof gtag === 'function') {
+        gtag('consent', 'update', { 'ad_storage': 'denied', 'ad_user_data': 'denied', 'ad_personalization': 'denied', 'analytics_storage': 'denied' });
+      }
+      var b = document.getElementById('pratt-cookie-banner'); if (b) b.hidden = true;
+    };
     if (!getConsent()) { var banner = document.getElementById('pratt-cookie-banner'); if (banner) banner.hidden = false; }
   })();
 </script>

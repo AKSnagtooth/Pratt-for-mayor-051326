@@ -234,7 +234,43 @@
   };
 </script>
 
-<!-- Google Tag (gtag) placeholder. Install via GTM container or replace with gtag base snippet at launch -->
+<!-- Google Analytics 4 (gtag.js) with consent mode -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-NKEHC011N6"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // Default consent: granted (matches Meta Pixel behavior — opt-out style)
+  gtag('consent', 'default', {
+    'ad_storage': 'granted',
+    'ad_user_data': 'granted',
+    'ad_personalization': 'granted',
+    'analytics_storage': 'granted'
+  });
+
+  // If user previously declined, downgrade consent immediately
+  try {
+    var _gc = localStorage.getItem('pratt-tracking-consent');
+    if (_gc) {
+      var _gp = JSON.parse(_gc);
+      if (_gp && _gp.value === 'declined' && _gp.expires > Date.now()) {
+        gtag('consent', 'update', {
+          'ad_storage': 'denied',
+          'ad_user_data': 'denied',
+          'ad_personalization': 'denied',
+          'analytics_storage': 'denied'
+        });
+      }
+    }
+  } catch(e) {}
+
+  gtag('config', 'G-NKEHC011N6', { anonymize_ip: true });
+</script>
+
+<!-- Vercel Analytics + Speed Insights (privacy-first, no cookies) -->
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
 
 <style>
   :root {
@@ -1345,11 +1381,27 @@
     }
     window.prattCookieAccept = function() {
       setConsent('accepted');
+      if (typeof gtag === 'function') {
+        gtag('consent', 'update', {
+          'ad_storage': 'granted',
+          'ad_user_data': 'granted',
+          'ad_personalization': 'granted',
+          'analytics_storage': 'granted'
+        });
+      }
       var b = document.getElementById('pratt-cookie-banner');
       if (b) b.hidden = true;
     };
     window.prattCookieDecline = function() {
       setConsent('declined');
+      if (typeof gtag === 'function') {
+        gtag('consent', 'update', {
+          'ad_storage': 'denied',
+          'ad_user_data': 'denied',
+          'ad_personalization': 'denied',
+          'analytics_storage': 'denied'
+        });
+      }
       var b = document.getElementById('pratt-cookie-banner');
       if (b) b.hidden = true;
     };

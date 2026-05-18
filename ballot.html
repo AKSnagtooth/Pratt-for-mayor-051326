@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#000000" />
 <meta property="og:title" content="Find Your Drop Box | Pratt for Mayor LA" />
 <meta property="og:description" content="Your ballot is in your mailbox. Mail it back today. Vote Spencer Pratt for Mayor by June 2." />
-<meta property="og:image" content="https://mayorpratt.com/wp-content/uploads/2026/01/OG-2.png" />
+<meta property="og:image" content="https://prattformayor2026.com/assets/img/og-image.png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta property="og:type" content="website" />
@@ -22,14 +22,27 @@
 <meta name="twitter:creator" content="@spencerpratt" />
 <meta name="twitter:title" content="Find Your Drop Box | Pratt for Mayor LA" />
 <meta name="twitter:description" content="Your ballot is in your mailbox. Mail it back today. Vote Spencer Pratt for Mayor by June 2." />
-<meta name="twitter:image" content="https://mayorpratt.com/wp-content/uploads/2026/01/OG-2.png" />
+<meta name="twitter:image" content="https://prattformayor2026.com/assets/img/og-image.png" />
 
 <!-- Canonical -->
 <link rel="canonical" href="https://prattformayor2026.com/ballot" />
 
-<!-- Favicon -->
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23F76B1C'/><text x='50' y='72' font-family='Georgia,serif' font-size='72' font-weight='900' text-anchor='middle' fill='%230A0A0A'>P</text></svg>" />
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23F76B1C'/><text x='50' y='72' font-family='Georgia,serif' font-size='72' font-weight='900' text-anchor='middle' fill='%230A0A0A'>P</text></svg>" />
+<!-- Favicon — uses the Pratt logo -->
+<link rel="icon" type="image/webp" href="/assets/img/logo.webp" />
+<link rel="apple-touch-icon" href="/assets/img/logo.webp" />
+<!-- Fallback SVG favicon for browsers that don't yet support webp favicons -->
+<link rel="alternate icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23F76B1C'/><text x='50' y='72' font-family='Georgia,serif' font-size='72' font-weight='900' text-anchor='middle' fill='%230A0A0A'>P</text></svg>" />
+
+<!-- Performance: preconnect to third-party origins to save DNS+TLS handshake on first request -->
+<link rel="preconnect" href="https://connect.facebook.net" crossorigin>
+<link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+<link rel="preconnect" href="https://challenges.cloudflare.com" crossorigin>
+<link rel="dns-prefetch" href="https://www.google-analytics.com">
+<link rel="dns-prefetch" href="https://www.facebook.com">
+
+<!-- Performance: preload the logo (above-fold) and the issues-city hero background -->
+<link rel="preload" as="image" href="/assets/img/logo.webp" fetchpriority="high">
+<link rel="preload" as="image" href="/assets/img/issues-city.webp">
 
 <!-- Cloudflare Turnstile (captcha) -->
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
@@ -224,7 +237,7 @@
   .hero {
     background:
       linear-gradient(180deg, rgba(10,10,10,0.85) 0%, var(--black) 100%),
-      url('https://mayorpratt.com/wp-content/themes/pratt-theme/assets/images/issues-city.webp');
+      url('/assets/img/issues-city.webp');
     background-size: cover;
     background-position: center;
     padding: 48px 20px 24px;
@@ -471,7 +484,7 @@
   .reminder {
     background:
       linear-gradient(135deg, rgba(10,10,10,0.92) 0%, rgba(10,10,10,0.75) 100%),
-      url('https://mayorpratt.com/wp-content/themes/pratt-theme/assets/images/signup-bg.webp');
+      url('/assets/img/signup-bg.webp');
     background-size: cover;
     background-position: center;
     padding: 60px 20px;
@@ -577,7 +590,7 @@
 <header class="header">
   <div class="header-inner">
     <a href="/" class="logo">
-      <img src="https://mayorpratt.com/wp-content/themes/pratt-theme/assets/images/logo.webp" alt="Pratt for Mayor of Los Angeles" />
+      <img src="/assets/img/logo.webp" alt="Pratt for Mayor of Los Angeles" loading="lazy" decoding="async" />
     </a>
     <a href="https://secure.anedot.com/pratt-for-mayor/49b6621f-b6b5-47cc-a713-064b339d8d70?recurring=true" class="donate-btn" style="background: var(--gold); color: var(--black); padding: 10px 22px; border-radius: 4px; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em;">Donate</a>
   </div>
@@ -675,7 +688,7 @@
 
 <footer class="footer">
   <div class="footer-logo">
-    <img src="https://mayorpratt.com/wp-content/themes/pratt-theme/assets/images/logo-footer.webp" alt="Pratt for Mayor of Los Angeles" />
+    <img src="/assets/img/logo-footer.webp" alt="Pratt for Mayor of Los Angeles" loading="lazy" decoding="async" />
   </div>
   <div class="footer-disclaimer">
     Paid for by Pratt for Mayor 2026 (FPPC ID 1485940)<br>

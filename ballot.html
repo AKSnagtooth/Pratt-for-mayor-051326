@@ -790,8 +790,10 @@
     const form = e.target;
     const email = form.querySelector('input[type=email]')?.value || '';
     const phone = form.querySelector('input[type=tel]')?.value || '';
-    const consentCheckbox = form.querySelector('input[type=checkbox]');
-    const consentSms = consentCheckbox ? consentCheckbox.checked : false;
+    // TCPA: clickwrap consent. Phone field is optional; if the user supplies one,
+    // they have read the conspicuous disclosure above the submit button and clicked
+    // submit = Express Written Consent. No phone → no SMS → consent_sms stays false.
+    const consentSms = !!phone;
     const userData = {};
     if (email) userData.email = email;
     if (phone) userData.phone = phone;
